@@ -14,7 +14,7 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 
-thedata = open('D:\\Project\\clinicalfirst_services\\Raghu\\results.txt', 'rb').read()
+thedata = open('/Practice Code/Raghu/results.txt', 'rb').read()
 sql = "INSERT INTO images (file_name) VALUES (%s)"
 # cursor initialized:-
 cursor = mysql.connection.cursor()

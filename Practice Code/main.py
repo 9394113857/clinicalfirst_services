@@ -94,10 +94,12 @@ def register():
 @app.route('/patient_login', methods=["POST"])
 def login():
     if 'email' in request.json and 'password' in request.json:
+
         email = request.json["email"]
         logging.info('Admin logged in')
         pw = request.json["password"]
         logging.warning('Watch out!')
+
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cur.execute("select * from patient_signup WHERE (PATIENT_MAIL_ID = %s )", (email,))
         details = cur.fetchone()

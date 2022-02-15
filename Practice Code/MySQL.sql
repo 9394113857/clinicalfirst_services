@@ -33,6 +33,15 @@ RENAME COLUMN image_1 TO image;
 ALTER TABLE patient_registration
 DROP COLUMN image;
 
+
+ALTER TABLE `clinicalfirst_services`.`patient_registration`
+ADD COLUMN `USER_NAME` VARCHAR(30) NULL AFTER `PATIENT_ID`,
+ADD COLUMN `USER_MAIL_ID` VARCHAR(50) NULL AFTER `USER_NAME`,
+ADD COLUMN `USER_PHONE_NUMBER` VARCHAR(20) NULL AFTER `USER_MAIL_ID`,
+ADD COLUMN `USER_PASSWORD` VARCHAR(200) NULL AFTER `USER_PHONE_NUMBER`,
+CHANGE COLUMN `PATIENT_ID` `PATIENT_ID` VARCHAR(20) NULL DEFAULT NULL ;
+
+
 CREATE TABLE `clinicalfirst_services`.`patient_sub_registration` (
   `ID` INT NOT NULL AUTO_INCREMENT,
   `PATIENT_ID` VARCHAR(200) NULL,
@@ -52,6 +61,42 @@ CREATE TABLE `clinicalfirst_services`.`patient_sub_registration` (
   `PATIENT_DATE_REGISTERED` DATETIME NULL,
   `PATIENT_DEVICE` VARCHAR(50) NULL,
   PRIMARY KEY (`ID`));
+
+
+# ================ #
+--
+-- Table structure for table `patient_registration`
+--
+
+DROP TABLE IF EXISTS `patient_registration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `patient_registration` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `PATIENT_ID` varchar(20) DEFAULT NULL,
+  `USER_NAME` varchar(30) DEFAULT NULL,
+  `USER_MAIL_ID` varchar(50) DEFAULT NULL,
+  `USER_PHONE_NUMBER` varchar(20) DEFAULT NULL,
+  `USER_PASSWORD` varchar(200) DEFAULT NULL,
+  `PATIENT_AGE` varchar(10) DEFAULT NULL,
+  `PATIENT_EXPERIANCE` int DEFAULT NULL,
+  `PATIENT_GENDERl` varchar(10) DEFAULT NULL,
+  `PATIENT_LICENSE_NUMBERl` varchar(100) DEFAULT NULL,
+  `FLAT_NO` varchar(50) DEFAULT NULL,
+  `STREET_NAME` varchar(45) DEFAULT NULL,
+  `CITY_NAME` varchar(45) DEFAULT NULL,
+  `STATE_NAME` varchar(45) DEFAULT NULL,
+  `COUNTRY_NAME` varchar(45) DEFAULT NULL,
+  `ZIP_CODE` varchar(50) DEFAULT NULL,
+  `PATIENT_APPROVED` varchar(45) DEFAULT NULL,
+  `PATIENT_IP` varchar(50) DEFAULT NULL,
+  `PATIENT_DATE_REGISTERED` datetime DEFAULT NULL,
+  `PATIENT_DEVICE` varchar(50) DEFAULT NULL,
+  `image` blob,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 
 
 

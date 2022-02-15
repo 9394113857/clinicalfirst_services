@@ -1,3 +1,4 @@
+import os
 import logging
 import socket
 from datetime import datetime, timedelta
@@ -9,13 +10,22 @@ from flask_mysqldb import MySQL
 from marshmallow import ValidationError, Schema, fields, validate
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'media/images'  # 'media/images'
+ALLOWED_EXTENSIONS = (['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+
 app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'raghu'
 app.config['MYSQL_DB'] = 'clinicalfirst_services'
-app.config['SECRET_KEY'] = 'raghu'
+app.config['SECRET_KEY'] = 'secret-key'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 mysql = MySQL(app)
 
 
@@ -23,7 +33,6 @@ mysql = MySQL(app)
 # @app.route("/")
 # def default():
 #     return "<h1>Test Message from Empty root !!!</h1>"
-
 
 # Validations:-
 class User_SignUp(Schema):
@@ -37,7 +46,40 @@ class User_SignUp(Schema):
                                                 r'[01]?[0-9][0-9]?)$'))
     # date = fields.String(validate=validate.Regexp(r'^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$'))
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@app.route('/image', methods=['POST'])
+def index():
+    now = datetime.now()
+    if request.method == 'POST':
+        userDetails = None
+        path = request.form['user_folder_path + filename']
+        mail_id = request.form['mail_id']
+        if request.files['image']:
+            userDetails = request.files['image']
+        # else:
+        #     userDetails = users(request.form)
+        if userDetails and allowed_file(userDetails.filename):
+            filename = secure_filename(userDetails.filename)
+            user_folder_path = app.config['UPLOAD_FOLDER'] + '/pics/'
+            if not os.path.exists(user_folder_path):
+                os.makedirs(user_folder_path)
+            userDetails.save(os.path.join(user_folder_path, filename))
+            try:
+                cursor = mysql.connection.cursor()
+                cursor.execute('INSERT INTO Images(file_name,mail_id,uploaded_on) VALUES(%s,%s,%s)',
+                               (user_folder_path + filename, mail_id, now))
+                mysql.connection.commit()
+                cursor.close()
+            except Exception as e:
+                print(e)
+                return "Unable to insert image metadata to db"
+            return "Image uploaded successfully."
+
+# ==================================PATIENT SIGNUP==================================== #
 # Signup:-
 @app.route('/user/insert', methods=['POST'])
 def User_signup():
